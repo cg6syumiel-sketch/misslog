@@ -31,7 +31,7 @@ export default function ListPage() {
     setFilter({ tags: next });
   };
 
-  const hasActiveFilter = filter.subject || filter.tags.length > 0 || filter.keyword || filter.showResolved;
+  const hasActiveFilter = !!(filter.subject || filter.tags.length > 0 || filter.keyword || filter.showResolved);
 
   return (
     <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
@@ -241,48 +241,48 @@ export default function ListPage() {
       {/* List */}
       <div style={{ flex: 1, padding: "12px 16px", display: "flex", flexDirection: "column", gap: 10 }}>
         {filtered.length === 0 ? (
-        <div
-          style={{
-            textAlign: "center",
-            padding: "60px 20px",
-            color: "var(--text-tertiary)",
-          }}
-        >
-          <p style={{ fontSize: 15, marginBottom: 8 }}>
-            {hasActiveFilter ? "条件に合うミスがありません" : "まだミスが記録されていません"}
-          </p>
-          {!hasActiveFilter && (
-            <div style={{ display: "flex", flexDirection: "column", gap: 10, alignItems: "center", marginTop: 12 }}>
-              <button
-                onClick={openAdd}
-                style={{
-                  background: "var(--accent)",
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: "var(--radius-md)",
-                  padding: "10px 20px",
-                  fontSize: 14,
-                  fontWeight: 600,
-                }}
-              >
-                最初のミスを記録する
-              </button>
-              <button
-                onClick={() => useMistakeStore.getState().seedData()}
-                style={{
-                  background: "none",
-                  color: "var(--text-tertiary)",
-                  border: "0.5px dashed var(--border-strong)",
-                  borderRadius: "var(--radius-md)",
-                  padding: "8px 16px",
-                  fontSize: 13,
-                }}
-              >
-                サンプルデータを投入する
-              </button>
-            </div>
-          )}
-        </div>
+          <div
+            style={{
+              textAlign: "center",
+              padding: "60px 20px",
+              color: "var(--text-tertiary)",
+            }}
+          >
+            <p style={{ fontSize: 15, marginBottom: 8 }}>
+              {hasActiveFilter ? "条件に合うミスがありません" : "まだミスが記録されていません"}
+            </p>
+            {!hasActiveFilter && (
+              <div style={{ display: "flex", flexDirection: "column", gap: 10, alignItems: "center", marginTop: 12 }}>
+                <button
+                  onClick={openAdd}
+                  style={{
+                    background: "var(--accent)",
+                    color: "#fff",
+                    border: "none",
+                    borderRadius: "var(--radius-md)",
+                    padding: "10px 20px",
+                    fontSize: 14,
+                    fontWeight: 600,
+                  }}
+                >
+                  最初のミスを記録する
+                </button>
+                <button
+                  onClick={() => useMistakeStore.getState().seedData()}
+                  style={{
+                    background: "none",
+                    color: "var(--text-tertiary)",
+                    border: "0.5px dashed var(--border-strong)",
+                    borderRadius: "var(--radius-md)",
+                    padding: "8px 16px",
+                    fontSize: 13,
+                  }}
+                >
+                  サンプルデータを投入する
+                </button>
+              </div>
+            )}
+          </div>
         ) : (
           filtered.map((m) => <MistakeCard key={m.id} mistake={m} onEdit={openEdit} />)
         )}
