@@ -58,6 +58,16 @@ export interface FilterState {
   showResolved: boolean;
 }
 
+export interface SRSSettings {
+  intervals: [number, number, number, number]; // [1回目, 2回目, 3回目, 4回目以降]
+  notifyOnOpen: boolean; // アプリを開いたとき通知バナーを表示
+}
+
+export const DEFAULT_SRS_SETTINGS: SRSSettings = {
+  intervals: [1, 3, 7, 14],
+  notifyOnOpen: true,
+};
+
 export interface AppStats {
   total: number;
   unreviewed: number;

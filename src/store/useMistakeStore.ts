@@ -5,8 +5,8 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { v4 as uuidv4 } from "uuid";
 import { format, subDays, parseISO, differenceInCalendarDays } from "date-fns";
-import type { Mistake, MistakeTag, FilterState, SortKey, AppStats } from "@/types";
-import { DEFAULT_SUBJECTS } from "@/types";
+import type { Mistake, MistakeTag, FilterState, SortKey, AppStats, SRSSettings } from "@/types";
+import { DEFAULT_SUBJECTS, DEFAULT_SRS_SETTINGS } from "@/types";
 import { calcNextReviewDate, getPriorityScore, isDueToday } from "@/lib/srs";
 import { generateSeedData } from "@/lib/seed";
 
@@ -15,6 +15,7 @@ interface MistakeStore {
   subjects: string[];
   filter: FilterState;
   sortKey: SortKey;
+  srsSettings: SRSSettings;
 
   // CRUD
   addMistake: (data: Omit<Mistake, "id" | "createdAt" | "updatedAt" | "reviewCount" | "lastReviewedAt" | "nextReviewDate" | "reviewHistory">) => void;
@@ -32,6 +33,9 @@ interface MistakeStore {
   // Filter & Sort
   setFilter: (filter: Partial<FilterState>) => void;
   setSortKey: (key: SortKey) => void;
+
+  // SRS Settings
+  setSRSSettings: (settings: Partial<SRSSettings>) => void;
 
   // Dev/Demo/IO
   seedData: () => void;
@@ -85,6 +89,7 @@ export const useMistakeStore = create<MistakeStore>()(
       subjects: [...DEFAULT_SUBJECTS],
       filter: { subject: "", tags: [], keyword: "", showResolved: false },
       sortKey: "newest",
+      srsSettings: { ...DEFAULT_SRS_SETTINGS },
 
       addMistake: (data) => {
         const now = new Date().toISOString();
@@ -115,6 +120,7 @@ export const useMistakeStore = create<MistakeStore>()(
 
       doReview: (id) => {
         const today = format(new Date(), "yyyy-MM-dd");
+        const { srsSettings } = get();
         set((s) => ({
           mistakes: s.mistakes.map((m) => {
             if (m.id !== id) return m;
@@ -125,7 +131,7 @@ export const useMistakeStore = create<MistakeStore>()(
               ...m,
               reviewCount: newCount,
               lastReviewedAt: today,
-              nextReviewDate: calcNextReviewDate(newCount),
+              nextReviewDate: calcNextReviewDate(newCount, srsSettings),
               reviewHistory: history,
               updatedAt: new Date().toISOString(),
             };
@@ -163,6 +169,10 @@ export const useMistakeStore = create<MistakeStore>()(
       },
 
       setSortKey: (key) => set({ sortKey: key }),
+
+      setSRSSettings: (settings) => {
+        set((s) => ({ srsSettings: { ...s.srsSettings, ...settings } }));
+      },
 
       seedData: () => {
         const data = generateSeedData();

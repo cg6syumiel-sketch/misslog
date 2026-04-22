@@ -2,22 +2,27 @@
 "use client";
 
 import { useState } from "react";
-import { ListChecks, CalendarCheck, LayoutDashboard } from "lucide-react";
+import { ListChecks, CalendarCheck, LayoutDashboard, Settings } from "lucide-react";
 import ListPage from "@/components/mistakes/ListPage";
 import TodayPage from "@/components/review/TodayPage";
 import DashboardPage from "@/components/dashboard/DashboardPage";
+import { SettingsModal } from "@/components/settings/SettingsModal";
+import { NotificationBanner } from "@/components/ui/NotificationBanner";
 import { useMistakeStore } from "@/store/useMistakeStore";
 
 type Tab = "list" | "today" | "dashboard";
 
 export default function Home() {
   const [tab, setTab] = useState<Tab>("list");
+  const [showSettings, setShowSettings] = useState(false);
   const dueCount = useMistakeStore((s) => s.getDueToday().length);
 
   return (
     <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+      <NotificationBanner />
+
       <main style={{ flex: 1, overflowY: "auto", paddingBottom: "calc(var(--bottom-nav-h) + 16px)" }}>
-        {tab === "list" && <ListPage />}
+        {tab === "list" && <ListPage onOpenSettings={() => setShowSettings(true)} />}
         {tab === "today" && <TodayPage />}
         {tab === "dashboard" && <DashboardPage />}
       </main>
@@ -57,16 +62,14 @@ export default function Home() {
               <div style={{ position: "relative" }}>
                 <Icon size={22} strokeWidth={active ? 2 : 1.5} />
                 {badge > 0 && (
-                  <span
-                    style={{
-                      position: "absolute", top: -4, right: -6,
-                      background: "var(--danger)", color: "#fff",
-                      fontSize: 9, fontWeight: 700,
-                      borderRadius: 99, minWidth: 16, height: 16,
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                      padding: "0 3px", lineHeight: 1,
-                    }}
-                  >
+                  <span style={{
+                    position: "absolute", top: -4, right: -6,
+                    background: "var(--danger)", color: "#fff",
+                    fontSize: 9, fontWeight: 700, borderRadius: 99,
+                    minWidth: 16, height: 16,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    padding: "0 3px",
+                  }}>
                     {badge > 99 ? "99+" : badge}
                   </span>
                 )}
@@ -76,6 +79,8 @@ export default function Home() {
           );
         })}
       </nav>
+
+      {showSettings && <SettingsModal onClose={() => setShowSettings(false)} />}
     </div>
   );
 }
